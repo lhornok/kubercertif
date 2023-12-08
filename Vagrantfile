@@ -11,7 +11,7 @@ Vagrant.configure("2") do |config|
     inline: "apt-get update && apt-get upgrade -y && apt-get install ansible -y"
 
   config.vm.provision "ansible_local" do |ansible|
-    ansible.playbook = "plabook.yml"
+    ansible.playbook = "playbook.yml"
   end
 
 end
