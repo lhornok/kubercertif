@@ -1,0 +1,36 @@
+---
+- hosts: all
+  become: yes
+  tasks:
+    - name: install vim
+      ansible.builtin.apt:
+        name: vim
+        update_cache: yes
+    - name: install curl
+      ansible.builtin.apt:
+        name: curl
+        update_cache: yes
+    - name: install apt-transport-https
+      ansible.builtin.apt:
+        name: apt-transport-https
+        update_cache: yes
+    - name: install git
+      ansible.builtin.apt:
+        name: git
+        update_cache: yes
+    - name: install wget
+      ansible.builtin.apt:
+        name: wget
+        update_cache: yes
+    - name: install software-properties-common
+      ansible.builtin.apt:
+        name: software-properties-common
+        update_cache: yes
+    - name: install lsb-release
+      ansible.builtin.apt:
+        name: lsb-release
+        update_cache: yes
+    - name: install ca-certificates
+      ansible.builtin.apt:
+        name: ca-certificates
+        update_cache: yes
