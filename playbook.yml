@@ -136,5 +136,17 @@
     - name: config yaml kubeadm
       template:
         src: kubeadm-config.j2
-        dest: kubeadm-config.yaml
-
+        dest: /home/vagrant/kubeadm-config.yaml
+    - name: kube init
+      shell: kubeadm init --config=/home/vagrant/kubeadm-config.yaml --upload-certs
+      register: kubeadmcommand
+    - name: create cube init output file
+      ansible.builtin.file:
+        path: kubeadm.command.output
+        owner: vagrant
+        group: vagrant
+        mode: 644
+    - name: save kubeadm command output to file
+      ansible.builtin.copy:
+        content: "{{ kubeadmcommand.sdtout }}"
+        dest: kubeadm.command.output
