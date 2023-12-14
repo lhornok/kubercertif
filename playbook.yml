@@ -67,6 +67,8 @@
     - name: Ensure the change in /etc/sysctl.d/kubernetes.conf are used by the current kernel
       command: sysctl --system
       register: sysctl
+    - debug:
+        var: sysctl.stdout_lines
     - name: get sysctl output
       ansible.builtin.debug:
         var: sysctl
