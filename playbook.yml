@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: localhost
   become: yes
   gather_facts: yes
   tasks:
@@ -137,16 +137,15 @@
         line: '{{ ansible_default_ipv4.address }} k8scp'
     - name: config yaml kubeadm
       template:
-        src: kubeadm-config.j2
-        dest: /home/vagrant/kubeadm-config.yaml
+        src: /root/kubercertif/kubeadm-config.j2
+        dest: /root/kubeadm-config.yaml
+        remote_src: yes
     - name: kube init
-      shell: kubeadm init --config=/home/vagrant/kubeadm-config.yaml --upload-certs
+      shell: kubeadm init --config=/root/kubeadm-config.yaml --upload-certs
       register: kubeadmcommand
     - name: create cube init output file
       ansible.builtin.file:
         path: kubeadm.command.output
-        owner: vagrant
-        group: vagrant
         mode: 644
     - name: save kubeadm command output to file
       ansible.builtin.copy:
