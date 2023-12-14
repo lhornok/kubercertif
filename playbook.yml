@@ -106,6 +106,12 @@
         regex: 'SystemdCgroup = false'
         line: 'SystemdCgroup = true'
         state: present
+    - name: Comment out disabled_plugins in /etc/containerd/config.toml
+      ansible.builtin.lineinfile:
+        path: /etc/containerd/config.toml
+        regexp: '^disabled_plugins = \["cri"\]'
+        line: '#disabled_plugins = ["cri"]'
+        backup: yes
     - name: restart containerd
       service:
         name: containerd
@@ -131,23 +137,23 @@
         state: present
     - name: apt hold
       command: apt-mark hold kubelet kubeadm kubectl
-    - name: host add ip
-      lineinfile:
-        path: /etc/hosts
-        line: '{{ ansible_default_ipv4.address }} k8scp'
-    - name: config yaml kubeadm
-      template:
-        src: /root/kubercertif/kubeadm-config.j2
-        dest: /root/kubeadm-config.yaml
-        remote_src: yes
-    - name: kube init
-      shell: kubeadm init --config=/root/kubeadm-config.yaml --upload-certs
-      register: kubeadmcommand
-    - name: create cube init output file
-      ansible.builtin.file:
-        path: kubeadm.command.output
-        mode: 644
-    - name: save kubeadm command output to file
-      ansible.builtin.copy:
-        content: "{{ kubeadmcommand.sdtout }}"
-        dest: kubeadm.command.output
+    # - name: host add ip
+    #   lineinfile:
+    #     path: /etc/hosts
+    #     line: '{{ ansible_default_ipv4.address }} k8scp'
+    # - name: config yaml kubeadm
+    #   template:
+    #     src: /root/kubercertif/kubeadm-config.j2
+    #     dest: /root/kubeadm-config.yaml
+    #     remote_src: yes
+    # - name: kube init
+    #   shell: kubeadm init --config=/root/kubeadm-config.yaml --upload-certs
+    #   register: kubeadmcommand
+    # - name: create cube init output file
+    #   ansible.builtin.file:
+    #     path: kubeadm.command.output
+    #     mode: 644
+    # - name: save kubeadm command output to file
+    #   ansible.builtin.copy:
+    #     content: "{{ kubeadmcommand.sdtout }}"
+    #     dest: kubeadm.command.output
