@@ -96,8 +96,17 @@
         update_cache: yes
         name: containerd.io
         state: present
+    - name: supprimer le config.toml existant
+      file:
+        path: /etc/containerd/config.toml
+        state: absent
     - name: config.toml containerd
-      command: containerd config default | tee /etc/containerd/config.toml
+      command: containerd config default
+      register: containerdcommand
+    - name: create /etc/containerd/config.toml
+      ansible.builtin.copy:
+        content: "{{ containerdcommand.stdout }}"
+        dest: /etc/containerd/config.toml
     - name: replace false to true SystedCgroup in /etc/containerd/config.toml
       lineinfile:
         path: /etc/containerd/config.toml
@@ -140,13 +149,31 @@
     - name: kube init
       shell: kubeadm init --config=/home/vagrant/kubeadm-config.yaml --upload-certs
       register: kubeadmcommand
-    - name: create cube init output file
-      ansible.builtin.file:
-        path: kubeadm.command.output
-        owner: vagrant
-        group: vagrant
-        mode: 644
     - name: save kubeadm command output to file
       ansible.builtin.copy:
-        content: "{{ kubeadmcommand.sdtout }}"
-        dest: kubeadm.command.output
+        content: "{{ kubeadmcommand.stdout }}"
+        dest: /home/vagrant/kubeadm.command.output
+    - name: Créer le dossier .kube
+      file:
+        path: /home/vagrant/.kube
+        state: directory
+        owner: vagrant
+        group: vagrant
+    - name: Copier le fichier de configuration kubernetes
+      copy:
+        src: /etc/kubernetes/admin.conf
+        dest: /home/vagrant/.kube/config
+        owner: vagrant
+        group: vagrant
+        remote_src: true # sans cette option = permission denied
+    - name: Copie cilium-cni.yaml
+      template:
+        src: cilium-cni.yaml
+        dest: /home/vagrant/cilium-cni.yaml
+    - name: Application fichier cilium-cni.yaml
+      shell: kubectl apply -f /home/vagrant/cilium-cni.yaml
+      become: false
+    - name: Execute the command in remote shell and write the output in the specified remote file
+      shell: kubectl completion bash > /etc/bash_completion.d/kubectl
+
+
